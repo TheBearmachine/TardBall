@@ -1,0 +1,4 @@
+﻿  Simulation.cpp
+c:\users\bear\documents\visual studio 2015\projects\tardball\tardball\simulation.cpp(19): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+  TardBall.vcxproj -> c:\Users\Bear\documents\visual studio 2015\Projects\TardBall\Debug\TardBall.exe
+  TardBall.vcxproj -> c:\Users\Bear\documents\visual studio 2015\Projects\TardBall\Debug\TardBall.pdb (Partial PDB)
