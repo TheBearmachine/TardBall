@@ -2,6 +2,8 @@
 #include "Entity.h"
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Text.hpp>
+#include "TextBox.h"
+
 class Simulation
 {
 public:
@@ -28,6 +30,19 @@ public:
 	sf::RenderWindow window;
 	sf::Text GUIText;
 	sf::Font defaultFont;
+
+	//GUI
+	void gui(int x, int y);
+
+	TextBox* currentBox;
+	TextBox* positionBox;
+	TextBox* velocityBox;
+	TextBox* elasticityBox;
+	TextBox* gravityBox;
+
+	std::vector<TextBox*> textBoxes;
+
+
 
 private:
 	void physics();

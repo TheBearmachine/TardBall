@@ -1,26 +1,35 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-namespace sf 
-{
-	class Event;
-}
 
 class TextBox
 {
 public:
-	TextBox(sf::Vector2f& position, sf::Vector2f& size, std::string value = "0");
+	TextBox(int x, int y, int width, int padding, std::string text = "", std::string fontPath = "arial.ttf", float fontSize = 14);
 	~TextBox();
+	TextBox();
 
-	void render(sf::RenderTarget* target);
-	bool isClicked(sf::Vector2f& clickPosition) const;
+	void render(sf::RenderTarget* target) const;
+	bool isClicked(int x, int y) const;
 	void handleInput(sf::Event& event);
+	void select();
+	void deselect();
+	std::string getValue() const;
+	void setText(std::string newText);
 
 private:
-	sf::Vector2f position;
-	sf::Vector2f size;
+	int x;
+	int y;
+	int width;
+	int height;
+	int padding;
+
+	std::string fontPath;
+	float fontSize;
+	sf::Font font;
+
 	sf::String value;
 	sf::Text text;
-	sf::FloatRect rect;
 	sf::RectangleShape box;
+	
 };

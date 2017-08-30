@@ -6,7 +6,20 @@ static const char* FONT_EH = "Fonts/sui_generis_rg.ttf";
 Simulation::Simulation() :
 	window(sf::VideoMode(640, 480), sf::String("Ball Sim"))
 {
+	currentBox = nullptr;
+	positionBox = new TextBox(0, 0, 60, 5, "Position");
+	velocityBox = new TextBox(80, 0, 60, 5, "Velocity");
+	elasticityBox = new TextBox(160, 0, 60, 5, "Elasticity");
+	gravityBox = new TextBox(240, 0, 60, 5, "Gravity");
+	
+	textBoxes = std::vector<TextBox*>();
 
+	textBoxes.push_back(positionBox);
+	textBoxes.push_back(velocityBox);
+	textBoxes.push_back(elasticityBox);
+	textBoxes.push_back(gravityBox);
+
+	
 }
 
 Simulation::~Simulation()
@@ -49,7 +62,13 @@ void Simulation::run()
 			{
 			case sf::Event::Closed:
 				window.close();
-
+				break;
+			case sf::Event::TextEntered:
+				if (currentBox)
+					currentBox->handleInput(event);
+				break;
+			case sf::Event::MouseButtonPressed:
+				gui(event.mouseButton.x, event.mouseButton.y);
 				break;
 #pragma region keyevents
 			case sf::Event::KeyPressed:
@@ -157,6 +176,31 @@ void Simulation::update()
 	ball.update(deltaTime);
 }
 
+void Simulation::gui(int x, int y)
+{
+	//SORRY
+
+	if (currentBox)
+		currentBox->deselect();
+
+	currentBox = nullptr;
+
+	if (positionBox->isClicked(x, y))
+		currentBox = positionBox;
+
+	if (velocityBox->isClicked(x, y))
+		currentBox = velocityBox;
+
+	if (elasticityBox->isClicked(x, y))
+		currentBox = elasticityBox;
+
+	if (gravityBox->isClicked(x, y))
+		currentBox = gravityBox;
+
+	if (currentBox)
+		currentBox->select();
+}
+
 void Simulation::physics()
 {
 	ball.mVelocity.y += gravity;
@@ -185,5 +229,9 @@ void Simulation::reset()
 void Simulation::render(sf::RenderWindow &win)
 {
 	ball.render(win);
+
+	for (auto box : textBoxes)
+		box->render(&win);
+
 	win.draw(GUIText);
 }
