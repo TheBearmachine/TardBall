@@ -7,17 +7,14 @@ Simulation::Simulation() :
 	window(sf::VideoMode(640, 480), sf::String("Ball Sim"))
 {
 	currentBox = nullptr;
-	positionBox = new TextBox(0, 0, 60, 5, "Position");
-	velocityBox = new TextBox(80, 0, 60, 5, "Velocity");
-	elasticityBox = new TextBox(160, 0, 60, 5, "Elasticity");
-	gravityBox = new TextBox(240, 0, 60, 5, "Gravity");
 	
 	textBoxes = std::vector<TextBox*>();
 
-	textBoxes.push_back(positionBox);
-	textBoxes.push_back(velocityBox);
-	textBoxes.push_back(elasticityBox);
-	textBoxes.push_back(gravityBox);
+	textBoxes.push_back(new TextBox(0, 10, 100, 3, "PositionX"));
+	textBoxes.push_back(new TextBox(120, 10, 100, 3, "PositionY"));
+	textBoxes.push_back(new TextBox(240, 10, 100, 3, "Velocity"));
+	textBoxes.push_back(new TextBox(360, 10, 100, 3, "Elasticity"));
+	textBoxes.push_back(new TextBox(480, 10, 100, 3, "Gravity"));
 
 	
 }
@@ -178,24 +175,16 @@ void Simulation::update()
 
 void Simulation::gui(int x, int y)
 {
-	//SORRY
-
 	if (currentBox)
 		currentBox->deselect();
 
 	currentBox = nullptr;
 
-	if (positionBox->isClicked(x, y))
-		currentBox = positionBox;
-
-	if (velocityBox->isClicked(x, y))
-		currentBox = velocityBox;
-
-	if (elasticityBox->isClicked(x, y))
-		currentBox = elasticityBox;
-
-	if (gravityBox->isClicked(x, y))
-		currentBox = gravityBox;
+	for (auto box : textBoxes)
+	{
+		if (box->isClicked(x, y))
+			currentBox = box;
+	}
 
 	if (currentBox)
 		currentBox->select();

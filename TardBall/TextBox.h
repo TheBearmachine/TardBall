@@ -5,7 +5,7 @@
 class TextBox
 {
 public:
-	TextBox(int x, int y, int width, int padding, std::string text = "", std::string fontPath = "arial.ttf", float fontSize = 14);
+	TextBox(int x, int y, int width, int padding,std::string name, std::string text = "", std::string fontPath = "arial.ttf", float fontSize = 14);
 	~TextBox();
 	TextBox();
 
@@ -16,6 +16,8 @@ public:
 	void deselect();
 	std::string getValue() const;
 	void setText(std::string newText);
+
+	std::string name;
 
 private:
 	int x;
@@ -30,6 +32,9 @@ private:
 
 	sf::String value;
 	sf::Text text;
+	sf::Text textName;
 	sf::RectangleShape box;
+
+	
 	
 };

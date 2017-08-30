@@ -2,11 +2,12 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-TextBox::TextBox(int x, int y, int width, int padding, std::string value, std::string fontPath, float fontSize) :
+TextBox::TextBox(int x, int y, int width, int padding, std::string name, std::string value, std::string fontPath, float fontSize) :
 	x(x),
 	y(y),
 	width(width),
 	padding(padding),
+	name(name),
 	value(value),
 	fontPath(fontPath),
 	fontSize(fontSize)
@@ -17,15 +18,22 @@ TextBox::TextBox(int x, int y, int width, int padding, std::string value, std::s
 	if (!font.loadFromFile(fontPath))
 		std::cout << "Failed to load font" << std::endl;
 
+	
+	textName = sf::Text(name + ":", font, fontSize);
+	textName.setPosition(x + padding / 2, y + padding / 2);
+	textName.setFillColor(sf::Color::Black);
+
 	text = sf::Text(value, font, fontSize);
-	text.setPosition(x + padding / 2, y + padding / 2);
+	text.setPosition(x + textName.getLocalBounds().width + padding, y + padding / 2);
 	text.setFillColor(sf::Color::Black);
 
-	height = text.getLocalBounds().height + padding * 2;
+
+	height = textName.getLocalBounds().height + padding * 2;
 	box = sf::RectangleShape(sf::Vector2f(width, height));
-	box.setPosition(x, y);
 	box.setFillColor(sf::Color::White);
 	box.setOutlineThickness(1);
+	box.setPosition(x, y);
+	
 
 	this->value = value;
 	text.setString(this->value);
@@ -44,6 +52,7 @@ TextBox::TextBox()
 void TextBox::render(sf::RenderTarget* target) const
 {
 	target->draw(box);
+	target->draw(textName);
 	target->draw(text);
 }
 

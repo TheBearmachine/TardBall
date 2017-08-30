@@ -35,10 +35,6 @@ public:
 	void gui(int x, int y);
 
 	TextBox* currentBox;
-	TextBox* positionBox;
-	TextBox* velocityBox;
-	TextBox* elasticityBox;
-	TextBox* gravityBox;
 
 	std::vector<TextBox*> textBoxes;
 
