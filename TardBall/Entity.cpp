@@ -8,6 +8,8 @@ Entity::Entity()
 Entity::Entity(sf::Vector2f & position, sf::Vector2f & velocity)
 	: mPosition(position), mVelocity(velocity)
 {
+	mSprite.setRadius(15.0f);
+	mSprite.setFillColor(sf::Color::Red);
 }
 
 Entity::~Entity()

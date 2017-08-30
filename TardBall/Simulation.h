@@ -9,6 +9,7 @@ public:
 	~Simulation();
 
 	void run();
+	void updateGUIText();
 	void update();
 	void render(sf::RenderWindow &win);
 
@@ -26,7 +27,9 @@ public:
 	Entity ball;
 	sf::RenderWindow window;
 	sf::Text GUIText;
+	sf::Font defaultFont;
 
 private:
 	void physics();
+	void reset();
 };
