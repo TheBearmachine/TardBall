@@ -20,6 +20,7 @@ public:
 	float airResistance;
 	float elasticity;
 
+	int fps;
 	float deltaTime;
 
 	bool simulate;
@@ -43,4 +44,5 @@ public:
 private:
 	void physics();
 	void reset();
+	void handleInput();
 };

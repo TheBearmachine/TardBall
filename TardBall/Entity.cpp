@@ -22,7 +22,7 @@ void Entity::reset()
 
 void Entity::update(const float & deltaTime)
 {
-	mPosition += mVelocity * deltaTime;
+	mPosition += mVelocity ;
 	mSprite.setPosition(mPosition);
 }
 
@@ -35,4 +35,5 @@ void Entity::draw(sf::RenderTarget & target, sf::RenderStates states) const
 void Entity::render(sf::RenderTarget& target)
 {
 	target.draw(mSprite);
+	printf("%f",mPosition.y);
 }

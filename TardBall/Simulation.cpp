@@ -1,5 +1,7 @@
 #include "Simulation.h"
 #include <SFML/Window/Event.hpp>
+#include <chrono>
+#include <thread>
 
 static const char* FONT_EH = "Fonts/sui_generis_rg.ttf";
 
@@ -7,16 +9,15 @@ Simulation::Simulation() :
 	window(sf::VideoMode(640, 480), sf::String("Ball Sim"))
 {
 	currentBox = nullptr;
-	
+
 	textBoxes = std::vector<TextBox*>();
+	textBoxes.push_back(new TextBox(0, 10, 100, 3, "VelocityX", &initialVelocity.x));
+	textBoxes.push_back(new TextBox(120, 10, 100, 3, "VelocityY", &initialVelocity.y));
+	textBoxes.push_back(new TextBox(240, 10, 100, 3, "Elasticity", &elasticity));
+	textBoxes.push_back(new TextBox(360, 10, 100, 3, "Gravity", &gravity));
+	textBoxes.push_back(new TextBox(480, 10, 100, 3, "Friction", &friction));
 
-	textBoxes.push_back(new TextBox(0, 10, 100, 3, "PositionX"));
-	textBoxes.push_back(new TextBox(120, 10, 100, 3, "PositionY"));
-	textBoxes.push_back(new TextBox(240, 10, 100, 3, "Velocity"));
-	textBoxes.push_back(new TextBox(360, 10, 100, 3, "Elasticity"));
-	textBoxes.push_back(new TextBox(480, 10, 100, 3, "Gravity"));
 
-	
 }
 
 Simulation::~Simulation()
@@ -41,7 +42,8 @@ void Simulation::run()
 	friction = 0.3f;
 	elasticity = 0.5f;
 	simulate = false;
-	deltaTime = 1.0f / 60.0f;
+	fps = 60;
+	deltaTime = 1.0f / (float)fps;
 
 	ball = Entity(initialPosition, initialVelocity);
 	updateGUIText();
@@ -50,113 +52,20 @@ void Simulation::run()
 	GUIText.setCharacterSize(16);
 	GUIText.setPosition(32, window.getSize().y / 10.0f);
 	GUIText.setFillColor(sf::Color::Green);
+
+	auto nextFrame = std::chrono::steady_clock::now();
 	while (window.isOpen())
 	{
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			switch (event.type)
-			{
-			case sf::Event::Closed:
-				window.close();
-				break;
-			case sf::Event::TextEntered:
-				if (currentBox)
-					currentBox->handleInput(event);
-				break;
-			case sf::Event::MouseButtonPressed:
-				gui(event.mouseButton.x, event.mouseButton.y);
-				break;
-#pragma region keyevents
-			case sf::Event::KeyPressed:
-				switch (event.key.code)
-				{
-				case sf::Keyboard::Escape:
-					window.close();
-					break;
 
-				case sf::Keyboard::A:
-					initialVelocity.x -= 0.1f;
-					initialVelocity.x = std::max(-4.0f, initialVelocity.x);
-					break;
+		nextFrame += std::chrono::milliseconds(1000 / fps);
 
-				case sf::Keyboard::D:
-					initialVelocity.x += 0.1f;
-					initialVelocity.x = std::min(4.0f, initialVelocity.x);
-					break;
+		handleInput();
+		update();
+		window.clear();
+		render(window);
+		window.display();
 
-				case sf::Keyboard::W:
-					initialVelocity.y -= 0.1f;
-					initialVelocity.y = std::max(-4.0f, initialVelocity.y);
-					break;
-
-				case sf::Keyboard::S:
-					initialVelocity.y += 0.1f;
-					initialVelocity.y = std::min(4.0f, initialVelocity.y);
-					break;
-
-				case sf::Keyboard::Left:
-					initialPosition.x -= 1.0f;
-					initialPosition.x = std::max(0.0f, initialPosition.x);
-					break;
-
-				case sf::Keyboard::Right:
-					initialPosition.x += 1.0f;
-					initialPosition.x = std::min((float)window.getSize().x, initialPosition.x);
-					break;
-
-				case sf::Keyboard::Up:
-					initialPosition.y -= 1.0f;
-					initialPosition.y = std::max(0.0f, initialPosition.y);
-					break;
-
-				case sf::Keyboard::Down:
-					initialPosition.y += 1.0f;
-					initialPosition.y = std::min((float)window.getSize().y, initialPosition.y);
-					break;
-
-				case sf::Keyboard::R:
-					elasticity += 0.1f;
-					elasticity = std::min(elasticity, 1.0f);
-					break;
-
-				case sf::Keyboard::F:
-					elasticity -= 0.1f;
-					elasticity = std::max(elasticity, 0.0f);
-					break;
-
-
-				case sf::Keyboard::T:
-					gravity += 0.01f;
-					gravity = std::min(gravity, 15.0f);
-					break;
-
-				case sf::Keyboard::G:
-					gravity -= 0.01f;
-					gravity = std::max(gravity, 0.5f);
-					break;
-
-				case sf::Keyboard::Space:
-					if (simulate = true)
-						reset();
-					simulate = !simulate;
-					break;
-				}
-				updateGUIText();
-
-				break;
-#pragma endregion
-
-			default:
-				break;
-			}
-
-			update();
-			window.clear();
-			render(window);
-			window.display();
-		}
-
+		std::this_thread::sleep_until(nextFrame);
 	}
 }
 
@@ -192,9 +101,9 @@ void Simulation::gui(int x, int y)
 
 void Simulation::physics()
 {
-	ball.mVelocity.y += gravity;
+	ball.mVelocity.y += gravity * deltaTime;
 
-	if (ball.mPosition.y >= window.getSize().y && ball.mVelocity.y < 0)
+	if (ball.mPosition.y >= (window.getSize().y - ball.mSprite.getRadius() * 2.0f) && ball.mVelocity.y > 0)
 	{
 		ball.mVelocity.y *= -elasticity;
 		if (ball.mVelocity.y >= -0.1f && ball.mVelocity.y <= 0.1f)
@@ -213,6 +122,108 @@ void Simulation::reset()
 {
 	ball.mPosition = initialPosition;
 	ball.mVelocity = sf::Vector2f();
+}
+
+void Simulation::handleInput()
+{
+	sf::Event event;
+	while (window.pollEvent(event))
+	{
+		switch (event.type)
+		{
+		case sf::Event::Closed:
+			window.close();
+			break;
+		case sf::Event::TextEntered:
+			if (currentBox)
+				currentBox->handleInput(event);
+			break;
+		case sf::Event::MouseButtonPressed:
+			gui(event.mouseButton.x, event.mouseButton.y);
+			break;
+		case sf::Event::KeyPressed:
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Escape:
+				window.close();
+				break;
+
+			case sf::Keyboard::A:
+				initialVelocity.x -= 1.f;
+				initialVelocity.x = std::max(-40.0f, initialVelocity.x);
+				break;
+
+			case sf::Keyboard::D:
+				initialVelocity.x += 1.f;
+				initialVelocity.x = std::min(40.0f, initialVelocity.x);
+				break;
+
+			case sf::Keyboard::W:
+				initialVelocity.y -= 1.f;
+				initialVelocity.y = std::max(-40.0f, initialVelocity.y);
+				break;
+
+			case sf::Keyboard::S:
+				initialVelocity.y += 1.f;
+				initialVelocity.y = std::min(40.0f, initialVelocity.y);
+				break;
+
+			case sf::Keyboard::Left:
+				initialPosition.x -= 1.f;
+				initialPosition.x = std::max(0.0f, initialPosition.x);
+				break;
+
+			case sf::Keyboard::Right:
+				initialPosition.x += 1.0f;
+				initialPosition.x = std::min((float)window.getSize().x, initialPosition.x);
+				break;
+
+			case sf::Keyboard::Up:
+				initialPosition.y -= 1.0f;
+				initialPosition.y = std::max(0.0f, initialPosition.y);
+				break;
+
+			case sf::Keyboard::Down:
+				initialPosition.y += 1.0f;
+				initialPosition.y = std::min((float)window.getSize().y, initialPosition.y);
+				break;
+
+			case sf::Keyboard::R:
+				elasticity += 0.1f;
+				elasticity = std::min(elasticity, 1.0f);
+				break;
+
+			case sf::Keyboard::F:
+				elasticity -= 0.1f;
+				elasticity = std::max(elasticity, 0.0f);
+				break;
+
+
+			case sf::Keyboard::T:
+				gravity += 0.01f;
+				gravity = std::min(gravity, 15.0f);
+				break;
+
+			case sf::Keyboard::G:
+				gravity -= 0.01f;
+				gravity = std::max(gravity, 0.5f);
+				break;
+
+			case sf::Keyboard::Space:
+				if (simulate == true)
+					reset();
+				ball.mVelocity = initialVelocity * deltaTime;
+				simulate = !simulate;
+				break;
+			}
+			updateGUIText();
+
+			break;
+
+		default:
+			break;
+		}
+	}
 }
 
 void Simulation::render(sf::RenderWindow &win)

@@ -5,7 +5,7 @@
 class TextBox
 {
 public:
-	TextBox(int x, int y, int width, int padding,std::string name, std::string text = "", std::string fontPath = "arial.ttf", float fontSize = 14);
+	TextBox(int x, int y, int width, int padding,std::string name, float* setTarget, std::string text = "", std::string fontPath = "arial.ttf", float fontSize = 14);
 	~TextBox();
 	TextBox();
 
@@ -25,6 +25,8 @@ private:
 	int width;
 	int height;
 	int padding;
+
+	float* target;
 
 	std::string fontPath;
 	float fontSize;

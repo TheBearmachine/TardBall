@@ -2,7 +2,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-TextBox::TextBox(int x, int y, int width, int padding, std::string name, std::string value, std::string fontPath, float fontSize) :
+TextBox::TextBox(int x, int y, int width, int padding, std::string name, float* setTarget, std::string value, std::string fontPath, float fontSize) :
 	x(x),
 	y(y),
 	width(width),
@@ -10,7 +10,8 @@ TextBox::TextBox(int x, int y, int width, int padding, std::string name, std::st
 	name(name),
 	value(value),
 	fontPath(fontPath),
-	fontSize(fontSize)
+	fontSize(fontSize),
+	target(setTarget)
 
 {
 	this->value = "INIT";
@@ -18,7 +19,7 @@ TextBox::TextBox(int x, int y, int width, int padding, std::string name, std::st
 	if (!font.loadFromFile(fontPath))
 		std::cout << "Failed to load font" << std::endl;
 
-	
+
 	textName = sf::Text(name + ":", font, fontSize);
 	textName.setPosition(x + padding / 2, y + padding / 2);
 	textName.setFillColor(sf::Color::Black);
@@ -33,7 +34,7 @@ TextBox::TextBox(int x, int y, int width, int padding, std::string name, std::st
 	box.setFillColor(sf::Color::White);
 	box.setOutlineThickness(1);
 	box.setPosition(x, y);
-	
+
 
 	this->value = value;
 	text.setString(this->value);
@@ -42,7 +43,7 @@ TextBox::TextBox(int x, int y, int width, int padding, std::string name, std::st
 
 TextBox::~TextBox()
 {
-	
+
 }
 
 TextBox::TextBox()
@@ -66,13 +67,14 @@ void TextBox::handleInput(sf::Event& event)
 		{
 			value.erase(value.getSize() - 1);
 			text.setString(value);
-		}	
-		else if(event.text.unicode != '\b')
+
+		}
+		else if (event.text.unicode != '\b')
 		{
 			value += static_cast<char>(event.text.unicode);
 			text.setString(value);
 		}
-		
+
 		break;
 
 	case sf::Event::KeyPressed:
@@ -89,6 +91,7 @@ void TextBox::select()
 void TextBox::deselect()
 {
 	box.setOutlineColor(sf::Color::White);
+	*target = std::stof(getValue());
 }
 
 std::string TextBox::getValue() const
