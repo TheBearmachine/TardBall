@@ -13,7 +13,7 @@ TextBox::TextBox(int setX, int setY, int setWidth, int setPadding, std::string s
 	target(setTarget)
 
 {
-	this->value = "INIT";
+	value = "INIT";
 
 	if (!font.loadFromFile(fontPath))
 		std::cout << "Failed to load font" << std::endl;
@@ -30,15 +30,15 @@ TextBox::TextBox(int setX, int setY, int setWidth, int setPadding, std::string s
 	text.setPosition(x + textName.getLocalBounds().width + padding, y + padding / 2);
 	text.setFillColor(sf::Color::Black);
 
-	height = textName.getLocalBounds().height + padding * 2;
+	height = text.getLocalBounds().height + padding * 2;
 
 	box = sf::RectangleShape(sf::Vector2f(width, height));
 	box.setFillColor(sf::Color::White);
 	box.setOutlineThickness(1);
 	box.setPosition(x, y);
 
-	this->value = setValue;
-	text.setString(this->value);
+	value = setValue;
+	text.setString(value);
 
 }
 

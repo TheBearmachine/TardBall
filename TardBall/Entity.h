@@ -12,7 +12,7 @@ public:
 	~Entity();
 
 	void reset();
-	void update(const float& deltaTime);
+	void update();
 
 	virtual void draw(sf::RenderTarget & target, sf::RenderStates states) const override;
 	virtual void render(sf::RenderTarget& target);

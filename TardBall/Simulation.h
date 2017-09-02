@@ -12,13 +12,16 @@ public:
 
 	void run();
 	void updateGUIText();
+	void initializeGUI();
 	void update();
 	void render(sf::RenderWindow &win);
+	bool isGrounded(Entity& entity);
 
 	float gravity;
 	float friction;
 	float airResistance;
 	float elasticity;
+	float floorHeight;
 
 	int fps;
 	float deltaTime;
@@ -33,7 +36,7 @@ public:
 	sf::Font defaultFont;
 
 	//GUI
-	void gui(int x, int y);
+	void onClick(int x, int y);
 
 	TextBox* currentBox;
 
