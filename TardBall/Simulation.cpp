@@ -135,6 +135,12 @@ void Simulation::handleInput()
 			window.close();
 			break;
 		case sf::Event::TextEntered:
+		if (event.text.unicode == 13)
+			{
+				currentBox->deselect();
+				currentBox = nullptr;
+			}
+
 			if (currentBox)
 				currentBox->handleInput(event);
 			break;

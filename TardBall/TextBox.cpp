@@ -1,16 +1,15 @@
 #include "TextBox.h"
 #include <iostream>
-#include <SFML/Graphics.hpp>
 
-TextBox::TextBox(int x, int y, int width, int padding, std::string name, float* setTarget, std::string value, std::string fontPath, float fontSize) :
-	x(x),
-	y(y),
-	width(width),
-	padding(padding),
-	name(name),
-	value(value),
-	fontPath(fontPath),
-	fontSize(fontSize),
+TextBox::TextBox(int setX, int setY, int setWidth, int setPadding, std::string setName, float* setTarget, std::string setValue, std::string setFontPath, float setFontSize) :
+	x(setX),
+	y(setY),
+	width(setWidth),
+	padding(setPadding),
+	name(setName),
+	value(setValue),
+	fontPath(setFontPath),
+	fontSize(setFontSize),
 	target(setTarget)
 
 {
@@ -19,8 +18,11 @@ TextBox::TextBox(int x, int y, int width, int padding, std::string name, float* 
 	if (!font.loadFromFile(fontPath))
 		std::cout << "Failed to load font" << std::endl;
 
+	if (setName == "")
+		textName = sf::Text(name, font, fontSize);
+	else
+		textName = sf::Text(name + ":", font, fontSize);
 
-	textName = sf::Text(name + ":", font, fontSize);
 	textName.setPosition(x + padding / 2, y + padding / 2);
 	textName.setFillColor(sf::Color::Black);
 
@@ -28,15 +30,14 @@ TextBox::TextBox(int x, int y, int width, int padding, std::string name, float* 
 	text.setPosition(x + textName.getLocalBounds().width + padding, y + padding / 2);
 	text.setFillColor(sf::Color::Black);
 
-
 	height = textName.getLocalBounds().height + padding * 2;
+
 	box = sf::RectangleShape(sf::Vector2f(width, height));
 	box.setFillColor(sf::Color::White);
 	box.setOutlineThickness(1);
 	box.setPosition(x, y);
 
-
-	this->value = value;
+	this->value = setValue;
 	text.setString(this->value);
 
 }
@@ -91,7 +92,23 @@ void TextBox::select()
 void TextBox::deselect()
 {
 	box.setOutlineColor(sf::Color::White);
-	*target = std::stof(getValue());
+
+	if (value == "")
+		return;
+
+	std::size_t t;
+	float f = std::stof(getValue(), &t);
+	std::cout << value.getSize() << " " << t << std::endl;
+	if(value.getSize() == t)
+	{
+		*target = f;
+	}
+	else
+	{
+		value = "0";
+		text.setString(value);
+		*target = 0;
+	}
 }
 
 std::string TextBox::getValue() const
